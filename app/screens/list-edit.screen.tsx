@@ -7,9 +7,11 @@ import AppScreen from "../components/@common/app-screen";
 import {
   AppForm,
   AppFormField,
+  AppFormImagePicker,
   AppFormPicker,
   AppSubmitButton,
 } from "../components/@common/forms";
+import useLocation from "../hooks/use-location";
 
 export interface ICategory {
   label: string;
@@ -21,6 +23,7 @@ export interface IListingEditForm {
   description?: string;
   price: number;
   title: string;
+  images: string[] | any;
 }
 
 const categories = [
@@ -39,18 +42,30 @@ const validationSchema = Yup.object().shape<IListingEditForm>({
     .required()
     .label("Category"),
   description: Yup.string().notRequired().label("Description"),
+  images: Yup.array()
+    .of(Yup.string())
+    .min(1, "Please select at least one image"),
   price: Yup.number().required().min(1).max(10000).label("Price"),
   title: Yup.string().required().min(1).label("Title"),
 });
 
 const ListEditScreen: FC = () => {
+  const location = useLocation();
+
   return (
     <AppScreen style={styles.container}>
       <AppForm
-        initialValues={{ category: "", description: "", price: "", title: "" }}
+        initialValues={{
+          category: "",
+          description: "",
+          images: [],
+          price: "",
+          title: "",
+        }}
         validationSchema={validationSchema}
         onSubmit={(values) => console.log("values", values)}
       >
+        <AppFormImagePicker name="images" />
         <AppFormField maxLength={255} name="title" placeholder="Title" />
         <AppFormField
           maxLength={8}
